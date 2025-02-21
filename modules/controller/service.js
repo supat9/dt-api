@@ -30,7 +30,7 @@ router.post(BASE_URL + "/addService", async (req, res) => {
 
     const values = [service_type, service_desc, service_status, service_time, service_date, vehicle_id];
 
-    const result = await dbCon.query(query, values);
+    const result = await dbCon.queryWithValue(query, values);
 
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
