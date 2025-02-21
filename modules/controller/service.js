@@ -3,9 +3,6 @@ const dbCon = require("../dbMiddleWare");
 const router = express.Router();
 const BASE_URL = "/service";
 
-/**
- * ดึงข้อมูล Service ทั้งหมด
- */
 router.post(BASE_URL + "/getService", async (req, res) => {
   try {
     const result = await dbCon.query("SELECT * FROM service");
@@ -16,19 +13,30 @@ router.post(BASE_URL + "/getService", async (req, res) => {
   }
 });
 
-/**
- * เพิ่มข้อมูล Service
- */
 router.post(BASE_URL + "/addService", async (req, res) => {
   try {
-    const { service_type, service_desc, service_status, service_time, service_date, vehicle_id } = req.body;
+    const {
+      service_type,
+      service_desc,
+      service_status,
+      service_time,
+      service_date,
+      vehicle_id,
+    } = req.body;
 
     const query = `
       INSERT INTO service (service_type, service_desc, service_status, service_time, service_date, vehicle_id)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`;
 
-    const values = [service_type, service_desc, service_status, service_time, service_date, vehicle_id];
+    const values = [
+      service_type,
+      service_desc,
+      service_status,
+      service_time,
+      service_date,
+      vehicle_id,
+    ];
 
     const result = await dbCon.queryWithValue(query, values);
 
@@ -39,9 +47,6 @@ router.post(BASE_URL + "/addService", async (req, res) => {
   }
 });
 
-/**
- * อัปเดตสถานะของ Service
- */
 router.post(BASE_URL + "/updateService", async (req, res) => {
   try {
     const { service_id, service_status } = req.body;
@@ -49,7 +54,9 @@ router.post(BASE_URL + "/updateService", async (req, res) => {
     console.log("Received Data:", req.body); // Debug ข้อมูลที่ได้รับ
 
     if (!service_id || !service_status) {
-      return res.status(400).json({ success: false, error: "ข้อมูลไม่ครบถ้วน" });
+      return res
+        .status(400)
+        .json({ success: false, error: "ข้อมูลไม่ครบถ้วน" });
     }
 
     const query = `UPDATE service SET service_status = $1 WHERE service_id = $2 RETURNING *`;
@@ -64,20 +71,20 @@ router.post(BASE_URL + "/updateService", async (req, res) => {
     }
   } catch (err) {
     console.error("Error updating service:", err);
-    res.status(500).json({ success: false, error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
+    res
+      .status(500)
+      .json({ success: false, error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
   }
 });
 
-
-/**
- * ลบ Service
- */
 router.post(BASE_URL + "/deleteService", async (req, res) => {
   try {
     const { service_id } = req.body;
 
     if (!service_id) {
-      return res.status(400).json({ success: false, error: "ข้อมูลไม่ครบถ้วน" });
+      return res
+        .status(400)
+        .json({ success: false, error: "ข้อมูลไม่ครบถ้วน" });
     }
 
     const query = `DELETE FROM service WHERE service_id = $1`;
@@ -92,9 +99,10 @@ router.post(BASE_URL + "/deleteService", async (req, res) => {
     }
   } catch (err) {
     console.error("Error deleting service:", err);
-    res.status(500).json({ success: false, error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
+    res
+      .status(500)
+      .json({ success: false, error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
   }
 });
-
 
 module.exports = router;

@@ -11,7 +11,6 @@ const SALT_ROUNDS = 10;
 
 let refreshTokens = [];
 
-// ✅ สมัครสมาชิก (SignUp) พร้อมเข้ารหัสรหัสผ่าน
 router.post(BASE_URL + "/signIn", async (req, res) => {
   try {
     const { username, password, name, address, contact, email } = req.body;
@@ -28,7 +27,7 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
       return res.status(409).json({ message: "Username already exists" });
     }
 
-    // 🔐 เข้ารหัสรหัสผ่านก่อนบันทึกลงฐานข้อมูล
+    // เข้ารหัสรหัสผ่านก่อนบันทึกลงฐานข้อมูล
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     let insertQuery = `
@@ -48,7 +47,7 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
   }
 });
 
-// ✅ ล็อกอิน (Login) พร้อมตรวจสอบรหัสผ่านแบบเข้ารหัส
+// ล็อกอิน (Login) พร้อมตรวจสอบรหัสผ่านแบบเข้ารหัส
 router.post(BASE_URL + "/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -65,7 +64,7 @@ router.post(BASE_URL + "/login", async (req, res) => {
 
     let userData = data.rows[0];
 
-    // 🔐 ตรวจสอบรหัสผ่าน (เปรียบเทียบรหัสที่เข้ารหัสไว้)
+    // ตรวจสอบรหัสผ่าน (เปรียบเทียบรหัสที่เข้ารหัสไว้)
     const passwordMatch = await bcrypt.compare(password, userData.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid Credentials" });
@@ -97,7 +96,7 @@ router.post(BASE_URL + "/login", async (req, res) => {
   }
 });
 
-// ✅ เปลี่ยนรหัสผ่าน (Update Password) พร้อมเข้ารหัสก่อนบันทึก
+// เปลี่ยนรหัสผ่าน (Update Password) พร้อมเข้ารหัสก่อนบันทึก
 router.post(BASE_URL + "/updatePassword", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -113,7 +112,7 @@ router.post(BASE_URL + "/updatePassword", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 🔐 เข้ารหัสรหัสผ่านใหม่ก่อนอัปเดต
+    // เข้ารหัสรหัสผ่านใหม่ก่อนอัปเดต
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     let updateQuery = `UPDATE user_data SET password = '${hashedPassword}' WHERE username = '${username}'`;
