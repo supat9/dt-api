@@ -46,6 +46,104 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+// Get User Profile by ID
+router.post(BASE_URL + "/getUserProfile", async (req, res) => {
+  try {
+    const { user_id } = req.body;  // รับ user_id จาก body ของคำขอ
+
+    if (!user_id) {
+      return res.status(400).json({ message: "Invalid Request. User ID is required." });
+    }
+
+    // Query to get user data by user_id
+    let queryStr = `SELECT user_id, username, name, address, contact, email, permission FROM user_data WHERE user_id = ${user_id}`;
+    let data = await dbCon.query(queryStr);
+
+    if (data.rowCount == 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let userData = data.rows[0];
+
+    // Don't include password in the response
+    delete userData.password;
+
+    return res.status(200).json({ user: userData });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+//GET ALL USER
+router.post(BASE_URL + "/getAllUser", async (req, res) => {
+  try {
+    let queryStr = `SELECT user_id, username, name, address, contact, email, permission FROM user_data`;
+    let data = await dbCon.query(queryStr);
+
+    if (data.rowCount == 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let userData = data.rows;
+
+    // Don't include password in the response
+    // delete userData.password;
+
+    return res.status(200).json({ user: userData });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+// Update Profile API
+router.post(BASE_URL + "/updateProfile", async (req, res) => {
+  try {
+    const { username, name, address, contact, email, password, permission } = req.body;
+
+    if (!username || !name || !address || !contact || !email || !permission) {
+      return res.status(400).json({ message: "Invalid Request. All fields must be provided." });
+    }
+
+    // Check if the user exists
+    let checkUserQuery = `SELECT * FROM user_data WHERE username = '${username}'`;
+    let existingUser = await dbCon.query(checkUserQuery);
+
+    if (existingUser.rowCount == 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // If password is provided, hash it
+    let passwordUpdateQuery = "";
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+      passwordUpdateQuery = `, password = '${hashedPassword}'`;
+    }
+
+    // Update the user's profile details
+    let updateQuery = `UPDATE user_data SET 
+        name = '${name}', 
+        address = '${address}', 
+        contact = '${contact}', 
+        email = '${email}', 
+        permission = '${permission}' ${passwordUpdateQuery} 
+        WHERE username = '${username}'`;
+
+    let result = await dbCon.query(updateQuery);
+
+    if (result.rowCount == 0) {
+      return res.status(500).json({ message: "Failed to update user profile" });
+    }
+
+    return res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 // ล็อกอิน (Login) พร้อมตรวจสอบรหัสผ่านแบบเข้ารหัส
 router.post(BASE_URL + "/login", async (req, res) => {

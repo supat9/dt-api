@@ -62,7 +62,7 @@ router.post(BASE_URL + "/updateService", async (req, res) => {
     const query = `UPDATE service SET service_status = $1 WHERE service_id = $2 RETURNING *`;
     const values = [service_status, service_id];
 
-    const result = await dbCon.query(query, values);
+    const result = await dbCon.queryWithValue(query, values);
 
     if (result.rowCount > 0) {
       res.json({ success: true, updated: result.rows[0] });
@@ -90,7 +90,7 @@ router.post(BASE_URL + "/deleteService", async (req, res) => {
     const query = `DELETE FROM service WHERE service_id = $1`;
     const values = [service_id];
 
-    const result = await dbCon.query(query, values);
+    const result = await dbCon.queryWithValue(query, values);
 
     if (result.rowCount === 0) {
       res.status(404).json({ success: false, error: "ไม่พบข้อมูล" });

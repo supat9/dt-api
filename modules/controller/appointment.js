@@ -7,6 +7,7 @@ router.post(BASE_URL + "/getAppointment", async (req, res) => {
   try {
     var query = `
       SELECT 
+        s.service_id AS "serviceId",
         u.name AS fullname,
         v.license_plate AS "licensePlate",
         v.brand AS "brand",
@@ -22,9 +23,9 @@ router.post(BASE_URL + "/getAppointment", async (req, res) => {
       JOIN vehicle v ON s.vehicle_id = v.vehicle_id
       JOIN user_data u ON v.user_id = u.user_id
       WHERE 1=1`;
-      if(req.body.userId){
-        query += ` AND u.user_id = '${req.body.userId}'`;
-      }
+    if (req.body.userId) {
+      query += ` AND u.user_id = '${req.body.userId}'`;
+    }
 
     const data = await dbCon.query(query);
     res.json(data.rows);
@@ -77,6 +78,7 @@ router.post(BASE_URL + "/updateAppointment", async (req, res) => {
     res.status(500).json({ success: false, error: errMsg });
   }
 });
+
 router.post(BASE_URL + "/deleteAppointment", async (req, res) => {
   try {
     if (req.body.appointment_id) {
