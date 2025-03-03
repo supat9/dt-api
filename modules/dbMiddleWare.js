@@ -19,8 +19,6 @@ pool.connect();
 
 exports.query = async function (queryStr) {
   let data = await pool.query(queryStr).then((res) => {
-    // query start unit
-    // console.log(strStartUnit)
     return res;
   });
   return data;
@@ -28,8 +26,6 @@ exports.query = async function (queryStr) {
 
 exports.queryWithValue = async function (queryStr, value) {
   let data = await pool.query(queryStr, value).then((res) => {
-    // query start unit
-    // console.log(strStartUnit)
     return res;
   });
   return data;

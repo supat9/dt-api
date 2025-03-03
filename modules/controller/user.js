@@ -49,13 +49,14 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
 // Get User Profile by ID
 router.post(BASE_URL + "/getUserProfile", async (req, res) => {
   try {
-    const { user_id } = req.body;  // รับ user_id จาก body ของคำขอ
+    const { user_id } = req.body; // รับ user_id จาก body ของคำขอ
 
     if (!user_id) {
-      return res.status(400).json({ message: "Invalid Request. User ID is required." });
+      return res
+        .status(400)
+        .json({ message: "Invalid Request. User ID is required." });
     }
 
-    // Query to get user data by user_id
     let queryStr = `SELECT user_id, username, name, address, contact, email, permission FROM user_data WHERE user_id = ${user_id}`;
     let data = await dbCon.query(queryStr);
 
@@ -65,7 +66,6 @@ router.post(BASE_URL + "/getUserProfile", async (req, res) => {
 
     let userData = data.rows[0];
 
-    // Don't include password in the response
     delete userData.password;
 
     return res.status(200).json({ user: userData });
@@ -85,10 +85,6 @@ router.post(BASE_URL + "/getAllUser", async (req, res) => {
     }
 
     let userData = data.rows;
-
-    // Don't include password in the response
-    // delete userData.password;
-
     return res.status(200).json({ user: userData });
   } catch (error) {
     console.log(error);
@@ -96,15 +92,16 @@ router.post(BASE_URL + "/getAllUser", async (req, res) => {
   }
 });
 
-
-
 // Update Profile API
 router.post(BASE_URL + "/updateProfile", async (req, res) => {
   try {
-    const { username, name, address, contact, email, password, permission } = req.body;
+    const { username, name, address, contact, email, password, permission } =
+      req.body;
 
     if (!username || !name || !address || !contact || !email || !permission) {
-      return res.status(400).json({ message: "Invalid Request. All fields must be provided." });
+      return res
+        .status(400)
+        .json({ message: "Invalid Request. All fields must be provided." });
     }
 
     // Check if the user exists
@@ -144,8 +141,7 @@ router.post(BASE_URL + "/updateProfile", async (req, res) => {
   }
 });
 
-
-// ล็อกอิน (Login) พร้อมตรวจสอบรหัสผ่านแบบเข้ารหัส
+// Login พร้อมตรวจสอบรหัสผ่านแบบเข้ารหัส
 router.post(BASE_URL + "/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -221,6 +217,29 @@ router.post(BASE_URL + "/updatePassword", async (req, res) => {
     }
 
     return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+//delete user
+router.post(BASE_URL + "/deleteUser", async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ message: "Invalid Request" });
+    }
+
+    let queryStr = `DELETE FROM user_data WHERE user_id = ${user_id}`;
+    let data = await dbCon.query(queryStr);
+
+    if (data.rowCount == 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });

@@ -7,6 +7,7 @@ router.post(BASE_URL + "/getAppointment", async (req, res) => {
   try {
     var query = `
       SELECT 
+        appointment_id,
         s.service_id AS "serviceId",
         u.name AS fullname,
         v.license_plate AS "licensePlate",

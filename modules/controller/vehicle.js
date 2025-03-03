@@ -41,51 +41,50 @@ router.post(BASE_URL + "/addVehicle", async (req, res) => {
 
 router.post(BASE_URL + "/updateVehicle", async (req, res) => {
   try {
-    if (req.body.license_plate && req.body.vehicle_id) {
-      var strQuery = `UPDATE vehicle SET license_plate = '${req.body.license_plate}', brand = '${req.body.brand}', model = '${req.body.model}', year = '${req.body.year}', miles = '${req.body.miles}' WHERE vehicle_id = '${req.body.vehicle_id}'`;
+    if (req.body.vehicle_id && req.body.user_id) {
+      const query = `UPDATE vehicle SET 
+          license_plate = $1, 
+          brand = $2, 
+          model = $3, 
+          year = $4, 
+          miles = $5 
+          WHERE vehicle_id = $6 AND user_id = $7`;
 
-      await dbCon.query(strQuery).then(async (data) => {
-        if (data.rowCount == 0) {
-          res.status(500).json({ success: false, error: "Data not found!!!" });
-        } else {
-          res.send({ success: true });
-        }
-      });
+      const params = [
+        req.body.license_plate,
+        req.body.brand,
+        req.body.model,
+        req.body.year,
+        req.body.miles,
+        req.body.vehicle_id,
+        req.body.user_id,
+      ];
+
+      await dbCon.queryWithValue(query, params);
+      res.json({ success: true });
     } else {
-      res.status(500).json({ success: false, error: "Not have brandName key" });
+      res
+        .status(400)
+        .json({ success: false, error: "Missing required fields" });
     }
   } catch (err) {
-    console.log("err ", err);
-    let errMsg = "";
-    if (err.detail?.indexOf("already exists") > -1) {
-      errMsg = "Data already exists!!!";
-    }
-    res.status(500).json({ success: false, error: errMsg });
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
 router.post(BASE_URL + "/deleteVehicle", async (req, res) => {
   try {
     if (req.body.vehicle_id) {
-      var strQuery = `DELETE FROM vehicle WHERE vehicle_id = '${req.body.vehicle_id}'`;
-
-      await dbCon.query(strQuery).then(async (data) => {
-        if (data.rowCount == 0) {
-          res.status(500).json({ success: false, error: "Data not found!!!" });
-        } else {
-          res.send({ success: true });
-        }
-      });
+      const query = `DELETE FROM vehicle WHERE vehicle_id = $1`;
+      await dbCon.queryWithValue(query, [req.body.vehicle_id]);
+      res.json({ success: true });
     } else {
-      res.status(500).json({ success: false, error: "Not have brandName key" });
+      res.status(400).json({ success: false, error: "Missing vehicle_id" });
     }
   } catch (err) {
-    console.log("err ", err);
-    let errMsg = "";
-    if (err.detail?.indexOf("already exists") > -1) {
-      errMsg = "Data already exists!!!";
-    }
-    res.status(500).json({ success: false, error: errMsg });
+    console.error(err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 

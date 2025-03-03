@@ -47,6 +47,56 @@ router.post(BASE_URL + "/addService", async (req, res) => {
   }
 });
 
+// Update service details
+router.post(BASE_URL + "/updateServices", async (req, res) => {
+  try {
+    const {
+      service_id,
+      service_type,
+      service_desc,
+      service_status,
+      service_time,
+      service_date,
+      vehicle_id,
+    } = req.body;
+
+    if (!service_id || !service_status || !vehicle_id) {
+      return res
+        .status(400)
+        .json({ success: false, error: "ข้อมูลไม่ครบถ้วน" });
+    }
+
+    const query = `
+      UPDATE service 
+      SET service_type = $1, service_desc = $2, service_status = $3, service_time = $4, service_date = $5, vehicle_id = $6 
+      WHERE service_id = $7 
+      RETURNING *`;
+
+    const values = [
+      service_type,
+      service_desc,
+      service_status,
+      service_time,
+      service_date,
+      vehicle_id, // Ensure vehicle_id is used in the update
+      service_id,
+    ];
+
+    const result = await dbCon.queryWithValue(query, values);
+
+    if (result.rowCount > 0) {
+      res.json({ success: true, updated: result.rows[0] });
+    } else {
+      res.status(404).json({ success: false, error: "ไม่พบข้อมูล" });
+    }
+  } catch (err) {
+    console.error("Error updating service:", err);
+    res
+      .status(500)
+      .json({ success: false, error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
+  }
+});
+
 router.post(BASE_URL + "/updateService", async (req, res) => {
   try {
     const { service_id, service_status } = req.body;

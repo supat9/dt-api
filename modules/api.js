@@ -16,11 +16,15 @@ const auth_controller = require("./controller/user");
 const service_controller = require("./controller/service");
 const appointment_controller = require("./controller/appointment");
 const vehicle_controller = require("./controller/vehicle");
+const payment_controller = require("./controller/payment");
+const repairOrder_controller = require("./controller/repairOrder");
 
 app.use(auth_controller);
 app.use(service_controller);
 app.use(appointment_controller);
 app.use(vehicle_controller);
+app.use(payment_controller);
+app.use(repairOrder_controller);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
