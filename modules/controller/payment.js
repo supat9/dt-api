@@ -48,12 +48,12 @@ router.post(
 
 router.post(BASE_URL + "/getRepairOrders", async (req, res) => {
   try {
-    var query = "SELECT order_id,cost,bill_desc FROM repair_order where 1=1";
+    const query = "SELECT order_id,cost,bill_desc FROM repair_order JOIN user_data u ON u.user_id = u.user_id where 1=1";
     if (req.body.userId) {
-      query += ` AND u.user_id = '${req.body.userId}'`;
+      query += ` AND u.user_id = $1`;
     }
     const data = await dbCon.query(query);
-    res.json(data.rows)
+    res.json(data.rows);
   } catch (err) {
     console.error("Error executing query", err);
     res.status(500).json({ success: false, error: "Internal server error" });

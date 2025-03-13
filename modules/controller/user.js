@@ -19,7 +19,6 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
       return res.status(400).json({ message: "Invalid Request" });
     }
 
-    // ตรวจสอบว่ามี username นี้อยู่แล้วหรือไม่
     let checkUserQuery = `SELECT * FROM user_data WHERE username = '${username}'`;
     let existingUser = await dbCon.query(checkUserQuery);
 
@@ -27,7 +26,6 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
       return res.status(409).json({ message: "Username already exists" });
     }
 
-    // เข้ารหัสรหัสผ่านก่อนบันทึกลงฐานข้อมูล
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     let insertQuery = `
@@ -46,6 +44,7 @@ router.post(BASE_URL + "/signIn", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 // Get User Profile by ID
 router.post(BASE_URL + "/getUserProfile", async (req, res) => {
   try {
@@ -74,6 +73,7 @@ router.post(BASE_URL + "/getUserProfile", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 //GET ALL USER
 router.post(BASE_URL + "/getAllUser", async (req, res) => {
   try {
@@ -158,7 +158,7 @@ router.post(BASE_URL + "/login", async (req, res) => {
 
     let userData = data.rows[0];
 
-    // ตรวจสอบรหัสผ่าน (เปรียบเทียบรหัสที่เข้ารหัสไว้)
+    // ตรวจสอบรหัสผ่าน
     const passwordMatch = await bcrypt.compare(password, userData.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid Credentials" });
@@ -177,7 +177,6 @@ router.post(BASE_URL + "/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    // Store the refresh token
     refreshTokens.push(refreshToken);
 
     res.json({
