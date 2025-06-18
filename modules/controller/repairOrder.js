@@ -3,7 +3,6 @@ const dbCon = require("../dbMiddleWare");
 const router = express.Router();
 const BASE_URL = "/repairOrder";
 
-// Get all repair orders (ใช้ GET)
 router.post(BASE_URL + "/getRepairOrders", async (req, res) => {
   try {
     const result = await dbCon.queryWithValue("SELECT * FROM repair_order");
@@ -14,12 +13,11 @@ router.post(BASE_URL + "/getRepairOrders", async (req, res) => {
   }
 });
 
-// Get all services
 router.post(BASE_URL + "/getServices", async (req, res) => {
   try {
     const result = await dbCon.query(
       "SELECT service_id, service_type FROM service"
-    ); // ✅ เพิ่ม service_type
+    ); 
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching services", err);

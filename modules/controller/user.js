@@ -74,7 +74,7 @@ router.post(BASE_URL + "/getUserProfile", async (req, res) => {
   }
 });
 
-//GET ALL USER
+//GET ALL USER API
 router.post(BASE_URL + "/getAllUser", async (req, res) => {
   try {
     let queryStr = `SELECT user_id, username, name, address, contact, email, permission FROM user_data`;
@@ -246,3 +246,5 @@ router.post(BASE_URL + "/deleteUser", async (req, res) => {
 });
 
 module.exports = router;
+
+

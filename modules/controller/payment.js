@@ -9,8 +9,8 @@ const axios = require("axios");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const API_URL = "https://api.slipok.com/api/line/apikey/39885";
-const API_KEY = "SLIPOK5SRZVEA";
+const API_URL = "https://api.slipok.com/api/line/apikey/41990";
+const API_KEY = "SLIPOKG291727";
 
 router.post(
   BASE_URL + "/uploadPayment",
